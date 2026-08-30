@@ -4,6 +4,19 @@ Navigation entry for Sara (opencode supervisor meta-agent) documentation.
 
 > Still in progress: this README is updated as the architecture-cleanup (2026-08-30) lands its final reports.
 
+## The live Sara — where the real thing lives
+
+Sara's **runtime self is version-controlled in-place at
+`C:\Users\98903\.config\opencode`** (git repo `82c89c4`): AGENTS.md policy,
+`opencode.jsonc` + `tui.json` runtime config, `command/`, `agent/`, `skills/`,
+`plugin/sara.js`, `memory/sara.md`, `test/`. This directory is the source of
+truth and the only live copy — do not edit mirrored docs expecting them live.
+Telemetry lives in `state/tool-events.ndjson` (unversioned runtime artifact).
+
+This repo is the **accompanying documentation/analysis layer** (navigation,
+system map, decision ledger, golden tasks + results) — see `SARA-DECISIONS.md`
+for the in-place versioning decision (001).
+
 ## Live — Current Architecture & Policy
 
 - **SARA_ARCHITECTURE_CLEANUP_REPORT.md** — read-only architecture inventory and cleanup analysis (input to this cleanup).
