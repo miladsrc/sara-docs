@@ -11,6 +11,12 @@
 - Map demo E0-E3 completed (SpringBoot + Angular)
 - Human Operating Layer deferred to Phase 9
 - 4 reasoned commits pushed to origin (tip 69c93b9)
+- Hardening batch DONE (P1-P8) — 79 unit total + live E2E green
+- Phase 2 token migration COMMITTED and COMPLETE — gate proof trio verified LIVE
+- Docs audit + PUSHED (e0e2c22)
+- E2 gate confirmed: LLM runtime 100% local (qwen2.5-coder:7b)
+- UI human access flow FIXED (login page, SPA routing, bearer auth)
+- 113+ tests passing
 
 ### Added
 - docs/PHASES/PHASE-2.md: SoD design doc (risk register R1-R7, steps A-H, gates G7/G8)
@@ -27,6 +33,11 @@
 - docs/DEMO_VALIDATION_SOD.md, docs/design/DASHBOARD_DESIGN.md
 - docs/HUMAN_OPERATING_LAYER_PROPOSAL.md (architectural preparation)
 - Phase 9 in MASTER_PLAN.md (DEFERRED)
+- api/authn.py: Token authentication (PBKDF2 200k, sha256-stored tokens)
+- api/routers/auth.py: /auth/login + /auth/me endpoints
+- migration 003_users.sql: users + api_tokens tables
+- scripts/create_user.py: User creation script
+- tests/test_auth_unit.py: 21 DB-free auth tests
 
 ### Changed
 - api/schemas.py: AgentRunUpdate.status now Optional
@@ -45,18 +56,25 @@
 ## 2026-08-25
 
 ### Added
-- Initial Sara documentation repository
+- Sara documentation repository (this repo) — portable knowledge base
 - README.md with complete Sara overview
 - ARCHITECTURE.md with trust boundaries and component responsibilities
 - CHANGELOG.md for tracking changes
-- ARCHITECTURE_DECISIONS.md (7 ADRs)
+- ARCHITECTURE_DECISIONS.md (10 ADRs total)
+- IDENTITY.md, CAPABILITIES.md, WORKING_RULES.md
+- PROJECT_CONTEXT.md, MEMORY.md, PORTABLE_KNOWLEDGE_BASE.md
+- config/AGENTS.md (opencode agent configuration)
+- memory/sara.md (persistent memory export)
+- skills/read-terminals/ (terminal monitoring skill)
+- scripts/load_sara.py (loader script)
 
 ### Key Documentation
 - Sara's role as external supervisor
-- Agent roster (12 specialized subagents)
-- Memory protocol (persistent cross-session)
-- Projects managed (ai-swe-engine, SARA v2)
+- Agent roster (13 specialized subagents including designer)
+- Memory protocol (persistent cross-session, append-only)
+- Projects managed (ai-swe-engine, SARA v2, todo-cli, todo-springboot, demo-map, game-agent)
 - Working rules and principles
+- 10 Architecture Decision Records
 
 ### ai-swe-engine
 - Phase 1 completed (Governance Integrity Hardening)
@@ -81,6 +99,7 @@
 - read-terminals skill added
 - Phase 4 knowledge investigation
 - Prompt-engineering round
+- Documentation fully rewritten for v0.2.0
 
 ---
 

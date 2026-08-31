@@ -1,7 +1,7 @@
 # Sara Portable Knowledge Base
 
-> **Version:** 1.0
-> **Date:** 2026-08-25
+> **Version:** 2.0
+> **Date:** 2026-08-26
 > **Purpose:** Make Sara's knowledge portable across environments
 
 ---
@@ -44,15 +44,18 @@ Read the files in this package to understand Sara's context and continue her wor
 sara-portable/
 ├── README.md                    # This file
 ├── IDENTITY.md                  # Sara's identity and persona
-├── MEMORY.md                    # Complete session history
+├── MEMORY.md                    # Complete session history (77 lines, 2026-08-26)
 ├── CAPABILITIES.md              # Skills and agent roster
 ├── WORKING_RULES.md             # How Sara operates
 ├── PROJECT_CONTEXT.md           # Projects Sara has worked on
-├── ARCHITECTURE_DECISIONS.md    # Key architectural decisions made
+├── ARCHITECTURE_DECISIONS.md    # 10 ADRs
+├── ARCHITECTURE.md              # Trust boundaries diagram
+├── CHANGELOG.md                 # Documentation changelog
+├── PORTABLE_KNOWLEDGE_BASE.md   # This file
 ├── config/
 │   └── AGENTS.md               # opencode agent configuration
 ├── memory/
-│   └── sara.md                 # Sara's persistent memory file
+│   └── sara.md                 # Sara's persistent memory file (77 lines)
 ├── skills/
 │   └── read-terminals/         # Terminal monitoring skill
 │       ├── SKILL.md
@@ -84,25 +87,49 @@ cp -r sara-docs/skills/* ~/.config/opencode/skills/
 
 ---
 
-## What Sara Knows (As of 2026-08-25)
+## What Sara Knows (As of 2026-08-26)
 
 ### Identity
 - Sara is a supervisor meta-agent ("god agent")
 - External to managed systems, never a runtime dependency
 - Plans, delegates, monitors, verifies — never executes destructive actions
+- SARA v2 is the default runtime for Level 1+ actions
 
 ### Projects Managed
-- **ai-swe-engine**: Phase 1 complete, 61 tests passing
-- **SARA v2**: MCP-based human-in-the-loop agent, Docker stack running
+- **ai-swe-engine**: Phase 0+1+Identity COMPLETE, Phase 2 SoD design COMPLETE + increment 1 done. 113+ tests passing. Version 0.2.0+
+- **SARA v2**: MCP-based human-in-the-loop agent, Docker stack running at 127.0.0.1:8800
+- **todo-cli**: Example project built by ai-swe-engine agents
+- **todo-springboot**: Spring Boot example, 16 tests pass
+- **demo-map-backend/frontend**: Map demo projects, MRPs green
+- **game-agent**: Chrome Dino agent, score ~2400
 
 ### Key Decisions Made
-- Sara is external to ai-swe-engine (ADR-001)
-- Master Development Plan is Source of Truth
-- 8 phases defined, Phase 1 complete
-- LLMs generate; deterministic software governs
+- ADR-001: Sara is external to ai-swe-engine
+- ADR-002: Master Development Plan is Source of Truth
+- ADR-003: LLMs generate; deterministic software governs
+- ADR-004: Human is final authority on all irreversible decisions
+- ADR-005: Token auth now, OIDC deferred
+- ADR-006: Sara v2 is default runtime
+- ADR-007: Phase 1 bugs fixed
+- ADR-008: Separation of Duties (Phase 2 SoD)
+- ADR-009: Governance Dashboard as Client Layer
+- ADR-010: Human Operating Layer deferred to Phase 9
 
 ### Current State
-- ai-swe-engine: Phase 1 complete, Phase 2 next
-- Memory: 47 lines of session history
-- Tests: 61 passing
-- Version: 0.2.0
+- ai-swe-engine: Phase 0+1+Identity COMPLETE, Phase 2 SoD design COMPLETE + increment 1
+- SARA v2: Default runtime, Gateway pipeline active
+- Memory: 77 lines of session history
+- Tests: 113+ passing
+- Version: 0.2.0+
+- Latest commit: 69c93b9 (pushed to github miladsrc/ai-swe-engine)
+- Dashboard: Live at /ui, zero-build vanilla JS
+- SoD: SASE_SOD_MODE=legacy default, strict behind flag, E2E validated
+- Phase 9: DEFERRED (Human Operating Layer)
+- LLM: 100% local — qwen2.5-coder:7b via Ollama, no cloud dependencies
+
+### Known Issues
+- CRP endpoint can set run.status='blocked' bypassing assert_run_patchable (engine bug)
+- MRP open_crp_ids snapshot misses post-MRP CRPs (display stale, safety holds)
+- Blueprint table has no API endpoint — must INSERT directly into Postgres
+- DNS poisoning risk: OpenVPN TAP adapter may re-assert on reconnect
+- SMB client registry changes PENDING REVERT

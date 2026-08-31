@@ -6,6 +6,12 @@
 
 ---
 
+## Standing Rules
+
+- **ARCHITECTURAL PRESERVATION RULE** (2026-08-26, m.barani, CRITICAL): ai-swe-engine core architecture must NOT be changed/replaced/redesigned. Role = identify weaknesses, improve components, strengthen boundaries, improve reliability/security/observability/maintainability incrementally. FORBIDDEN: new architectures, pattern migrations, replacing core components w/o approval, restructuring modules for aesthetics, large frameworks/infra w/o approval, removing working features. Every change must answer: (1) how it preserves current arch, (2) why improvement-not-redesign, (3) what behavior stays unchanged, (4) smallest implementation path. Fundamental limitations -> document + trade-offs + alternatives + WAIT FOR APPROVAL, never implement unilaterally.
+
+---
+
 ## Session Log
 
 ### 2026-08-23
@@ -24,7 +30,6 @@
 - **PENDING REVERT** when user confirms
 
 - User asked to "download gml 3.5", then cancelled ("forget it")
-- Meaning of gml unclear, no action taken
 
 - game-agent project (IdeaProjects\game-agent):
   - Upgraded dino agent from vision-only to perfect-information "direct" mode
@@ -35,7 +40,6 @@
   - User declined further tuning ("merge them, it won't get better")
   - Bugs fixed: obstacles-behind-player causing jump spam
   - Blocking duck removed in direct mode (birds can't hit grounded player in this game)
-  - NOTE: concurrent edits/launches happened on this repo during the session
 
 ---
 
@@ -64,7 +68,7 @@
 - docker compose stack UP: sara-db-1 + sara-app-1, health ok
 
 - E2E approval demo PASSED live
-- SARA V2 IS NOW THE DEFAULT RUNTIME
+- **SARA V2 IS NOW THE DEFAULT RUNTIME** — v1 routes Level 1+ actions through v2 Gateway
 
 - **read-terminals skill added** (user approved)
 
@@ -72,8 +76,8 @@
 - Built agents/ package with 6 RolePolicies, 8 new unit tests
 - ai-swe-engine pushed to origin = https://github.com/miladsrc/ai-swe-engine
 
-- **QWEN IS LIVE** - Ollama 0.32.15, qwen2.5-coder:7b imported via Modelfile
-- **FULL OFFLINE DEV FLOW ACHIEVED** - validated SPEC-TODO-CORE-R4 -> RUN-QW-2026-00009 -> CLI works
+- **QWEN IS LIVE** — Ollama 0.32.15, qwen2.5-coder:7b imported via Modelfile
+- **FULL OFFLINE DEV FLOW ACHIEVED** — validated SPEC-TODO-CORE-R4 -> RUN-QW-2026-00009 -> CLI works
 
 - Prompt-engineering round done, suite 48 pass
 - Documentation fully rewritten for v0.2.0
@@ -84,9 +88,9 @@
 
 ### 2026-08-25
 
-- **Master plan provided** by m.barani - 8 phases defined
+- **Master plan provided** by m.barani — 8 phases defined
 - **Documentation structure created** (docs/MASTER_PLAN, ARCHITECTURE, PHASES, ADR, CHANGELOG, PROGRESS)
-- **Gap analysis performed** - Phase 0 COMPLETE, Phase 1 NOT STARTED
+- **Gap analysis performed** — Phase 0 COMPLETE, Phase 1 NOT STARTED
 - **Phase 1 completed** (Governance Integrity Hardening)
   - Fixed 2 bugs, added provenance tagging, built evidence export endpoint
   - All 61 tests passing, version bumped to 0.2.0
@@ -97,9 +101,8 @@
 
 ### 2026-08-26
 
-- **Todo-SpringBoot complete flow** - Full end-to-end: blueprint, specs, LLM code gen, 16 tests pass
-- **Hardening batch DONE** (P1-P8) - 79 unit total + live E2E green
-- **Commits**: 43f28f8, c3d913c, e8aa561 (hardening batch)
+- **Todo-SpringBoot complete flow** — Full end-to-end: blueprint, specs, LLM code gen, 16 tests pass
+- **Hardening batch DONE** (P1-P8) — 79 unit total + live E2E green
 - **PHASE 2 START - human identity**: Token login, migration 003, require_human_actor
 - **Phase 2 token migration COMMITTED**: 3e0d294 + a2ed450 merged as 8e08cc1
 - **Token migration COMPLETE**: Gate proof trio verified LIVE, 101 unit + live E2E
@@ -119,23 +122,29 @@
 ## Key Facts
 
 ### Projects
-- **ai-swe-engine**: Phase 2 SoD design COMPLETE, implementation started (increment 1). Phase 0+1+Human Identity COMPLETE. 113+ tests passing. Version 0.2.0+
-- **SARA v2**: MCP-based human-in-the-loop agent, Docker stack running
+- **ai-swe-engine**: Phase 2 SoD design COMPLETE, increment 1 done. Phase 0+1+Human Identity COMPLETE. 113+ tests passing. Version 0.2.0+
+- **SARA v2**: MCP-based human-in-the-loop agent, Docker stack running. Default runtime for Level 1+ actions.
 - **todo-cli**: Example project built by ai-swe-engine agents
-- **demo-map-backend/frontend**: Map demo projects (SpringBoot + Angular)
+- **demo-map-backend/frontend**: Map demo projects (SpringBoot + Angular), MRPs green
+- **todo-springboot**: Spring Boot example, 16 tests pass
+- **sara-docs**: Portable knowledge base (this repo)
+- **game-agent**: Chrome Dino agent, score ~2400
 
 ### Architecture Decisions
-- Sara is external to ai-swe-engine (ADR-001)
-- Master Development Plan is Source of Truth (ADR-002)
-- 8 phases defined + Phase 9 (Human Operating Layer, DEFERRED)
-- LLMs generate; deterministic software governs (ADR-003)
-- Human is final authority on all irreversible decisions (ADR-004)
-- Token auth now, OIDC deferred (ADR-005)
-- Sara v2 is default runtime (ADR-006)
-- Phase 1 bugs fixed (ADR-007)
+- ADR-001: Sara is external to ai-swe-engine
+- ADR-002: Master Development Plan is Source of Truth
+- ADR-003: LLMs generate; deterministic software governs
+- ADR-004: Human is final authority on all irreversible decisions
+- ADR-005: Token auth now, OIDC deferred
+- ADR-006: Sara v2 is default runtime (Level 1+ through Gateway)
+- ADR-007: Phase 1 bugs fixed (CRP assert_run_patchable, MRP live CRP query)
+- ADR-008: Separation of Duties (Phase 2 SoD, SASE_SOD_MODE=legacy default)
+- ADR-009: Governance Dashboard as Client Layer
+- ADR-010: Human Operating Layer deferred to Phase 9
 
-### Current State
-- ai-swe-engine: Phase 2 SoD design COMPLETE, increment 1 done, Phase 0+1+Identity COMPLETE
+### Current State (as of 2026-08-26)
+- ai-swe-engine: Phase 0+1+Identity COMPLETE, Phase 2 SoD design COMPLETE + increment 1
+- SARA v2: Default runtime, Gateway pipeline active
 - Memory: 77 lines of session history
 - Tests: 113+ passing
 - Version: 0.2.0+
@@ -143,3 +152,13 @@
 - Dashboard: Live at /ui, zero-build vanilla JS, black/gold + blue/white theme
 - SoD: SASE_SOD_MODE=legacy default, strict behind flag, E2E validated
 - Phase 9: DEFERRED (Human Operating Layer)
+- LLM: 100% local — qwen2.5-coder:7b via Ollama, no cloud dependencies
+
+### Known Issues / Open Items
+- CRP endpoint can set run.status='blocked' bypassing assert_run_patchable (engine bug, unfixed)
+- MRP open_crp_ids snapshot misses CRPs raised AFTER MRP creation (display stale, safety holds)
+- Blueprint table has no API endpoint — must INSERT directly into Postgres
+- Sister session's files uncommitted: agents/config.py (+designer role), designer_agent.py, SPRINGBOOT-TODO-SESSION-REPORT.md
+- Ollama install needs workdir=gguf dir (no --workdir flag)
+- DNS poisoning risk: OpenVPN TAP adapter may re-assert on reconnect
+- SMB client registry changes still PENDING REVERT

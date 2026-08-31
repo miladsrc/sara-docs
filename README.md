@@ -124,6 +124,10 @@ An autonomous software engineering engine that:
 - Coder Agents (Python + SpringBoot, propose_only mode)
 - Agent Layer (8 roles including designer)
 
+**Tests:** 113+ passing
+**Version:** 0.2.0+
+**Repository:** https://github.com/miladsrc/ai-swe-engine
+
 ### 5.2 SARA v2
 
 **Status:** Active (Docker-based)
@@ -133,6 +137,13 @@ A human-in-the-loop agent with:
 - Gateway pipeline (classify → policy → approval → execute → audit)
 - Approval levels (L0-L3) with escalation
 - PostgreSQL + pgvector for memory
+
+### 5.3 sara-docs (this repo)
+
+**Status:** Active
+**Purpose:** Portable knowledge base for Sara
+
+Complete export of Sara's knowledge, identity, memory, and capabilities. Can be used to load Sara into a new environment or restore context after failures.
 
 ---
 
@@ -162,6 +173,7 @@ A human-in-the-loop agent with:
 - Installed Git 2.55
 - Cloned multiple repositories
 - Fixed DNS poisoning issue with OpenVPN
+- Game-agent dino agent upgraded
 
 ### 2026-08-24
 - Built SARA v2 (MCP-based human-in-the-loop agent)
@@ -169,13 +181,15 @@ A human-in-the-loop agent with:
 - Achieved full offline dev flow with Qwen 7B
 - Pushed ai-swe-engine to GitHub (miladsrc)
 - Completed architectural self-assessment
+- SARA v2 became default runtime
 
 ### 2026-08-25
 - Saved Master Development Plan as Source of Truth
 - Created documentation structure
 - Completed Phase 1 (Governance Integrity Hardening)
 - Fixed 2 known bugs, added provenance tagging, built evidence export
-- All 61 tests passing
+- 61 tests passing
+- Created Sara portable knowledge base (this repo)
 
 ### 2026-08-26
 - Phase 2 SoD design and increment 1 committed (4 commits pushed)
@@ -183,6 +197,9 @@ A human-in-the-loop agent with:
 - SoD validation demo completed end-to-end
 - Map demo E0-E3 completed (SpringBoot + Angular)
 - Human Operating Layer deferred to Phase 9
+- Hardening batch DONE (P1-P8)
+- Phase 2 token migration COMPLETE
+- E2 gate confirmed: LLM runtime 100% local
 - 113+ tests passing
 
 ---

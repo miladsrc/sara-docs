@@ -40,6 +40,7 @@ An autonomous software engineering engine that:
 - **Governance Dashboard** (static/ui/, api/routers/dashboard.py): Zero-build vanilla JS, bearer auth
 - **Coder Agents**: Python + SpringBoot, propose_only mode for SoD strict
 - **Agent Layer**: 8 roles (product, spec, coder, reviewer, reflection, test_runner, springboot_coder, designer)
+- **Auth** (api/authn.py, api/routers/auth.py): Token-based login, PBKDF2 200k, /auth/login + /auth/me
 
 #### Key Files
 - `agents/orchestrator.py` - Pipeline orchestration (legacy + strict SoD modes)
@@ -49,9 +50,15 @@ An autonomous software engineering engine that:
 - `api/gates.py` - Governance gates
 - `api/routers/dashboard.py` - Dashboard API
 - `api/security.py` - Auth (require_human_actor, require_authenticated_actor)
+- `api/authn.py` - Token authentication (PBKDF2)
 - `static/ui/` - Dashboard UI (app.js, index.html, styles.css)
 - `docs/MASTER_PLAN.md` - Source of Truth
 - `docs/PHASES/PHASE-2.md` - SoD design doc
+
+#### Known Issues
+- CRP endpoint can set run.status='blocked' bypassing assert_run_patchable (engine bug)
+- MRP open_crp_ids snapshot misses CRPs raised AFTER MRP creation (display stale, safety holds)
+- Blueprint table has no API endpoint — must INSERT directly into Postgres
 
 ---
 
@@ -76,6 +83,12 @@ A human-in-the-loop agent with:
 - Audit trail logs all actions
 - Memory manager handles pgvector storage
 
+#### Trust Boundary
+- Sara v1 = interactive front-end (opencode agent)
+- Sara v2 = default runtime for Level 1+ actions
+- Approver prefix "gateway-controller:" mandatory
+- Fallback to direct execution only if stack down + must disclose
+
 ---
 
 ### 3. todo-cli
@@ -94,7 +107,7 @@ An example project built by the ai-swe-engine agent layer to demonstrate the ful
 **Built by:** ai-swe-engine SpringBoot coder agent
 **Repository:** IdeaProjects\todo-springboot
 
-Full end-to-end Spring Boot example: auth, chat, calendar/reminders, SPA frontend. 16 tests pass (6 controller + 10 service).
+Full end-to-end Spring Boot example: auth, chat, calendar/reminders, SPA frontend. 16 tests pass (6 controller + 10 service). Fixed H2 'USER' reserve word bug with @Table(name='users').
 
 ---
 
@@ -113,6 +126,16 @@ SpringBoot backend + Angular 17 frontend for location CRUD. Both MRPs green, awa
 **Repository:** IdeaProjects\game-agent
 
 Chrome Dino game agent upgraded from vision-only to perfect-information "direct" mode. Score 867 -> ~2400 consistent.
+
+---
+
+### 7. sara-docs (this repo)
+
+**Status:** Active (2026-08-25)
+**Repository:** https://github.com/miladsrc/sara-docs
+**Purpose:** Portable knowledge base for Sara
+
+Complete export of Sara's knowledge, identity, memory, and capabilities. Used to load Sara into new environments or restore context after failures.
 
 ---
 
