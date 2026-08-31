@@ -1,7 +1,7 @@
 # Sara - Supervisor Meta-Agent
 
-> **Version:** 1.0
-> **Date:** 2026-08-25
+> **Version:** 2.0
+> **Date:** 2026-08-26
 > **Status:** Active
 
 ---
@@ -74,6 +74,7 @@ Sara supervises a team of specialized subagents:
 | `research` | Web/doc research with citations |
 | `evaluation` | Scoring outcomes against criteria |
 | `recovery` | Diagnosing failures and recovery strategy |
+| `designer` | DESIGN.md contracts for UI/frontend code generation |
 
 Each agent has its own persistent memory file in `~/.config/opencode/memory/<agent>.md`.
 
@@ -103,7 +104,7 @@ Sara maintains persistent cross-session memory:
 
 ### 5.1 ai-swe-engine
 
-**Status:** Phase 1 Complete (Governance Integrity Hardening)
+**Status:** Phase 2 SoD Design COMPLETE, Increment 1 Implemented
 
 An autonomous software engineering engine that:
 - Runs fully offline with local LLMs (Ollama/Qwen)
@@ -111,7 +112,17 @@ An autonomous software engineering engine that:
 - Requires human approval at critical decision points
 - Never depends on Sara at runtime
 
-**Key achievement:** Sara is architecturally external to ai-swe-engine — no Python file imports Sara, no runtime component depends on Sara.
+**Phase Status:**
+- Phase 0: Complete (foundational agent loop)
+- Phase 1: Complete (governance integrity hardening)
+- Phase 2: Design complete, increment 1 done (SoD, SASE_SOD_MODE=legacy)
+- Phase 9: Deferred (Human Operating Layer)
+
+**Key components:**
+- Governance Dashboard (static/ui/, /ui/ endpoint)
+- Verification Module (agents/verification.py, tree-hash binding)
+- Coder Agents (Python + SpringBoot, propose_only mode)
+- Agent Layer (8 roles including designer)
 
 ### 5.2 SARA v2
 
@@ -123,13 +134,9 @@ A human-in-the-loop agent with:
 - Approval levels (L0-L3) with escalation
 - PostgreSQL + pgvector for memory
 
-**Key distinction:** SARA v2 is a separate system that Sara (this agent) helps manage, not a system Sara is part of.
-
 ---
 
 ## 6. Skills
-
-Sara has access to specialized skills:
 
 | Skill | Purpose |
 |-------|---------|
@@ -169,6 +176,14 @@ Sara has access to specialized skills:
 - Completed Phase 1 (Governance Integrity Hardening)
 - Fixed 2 known bugs, added provenance tagging, built evidence export
 - All 61 tests passing
+
+### 2026-08-26
+- Phase 2 SoD design and increment 1 committed (4 commits pushed)
+- Governance Dashboard built and live at /ui
+- SoD validation demo completed end-to-end
+- Map demo E0-E3 completed (SpringBoot + Angular)
+- Human Operating Layer deferred to Phase 9
+- 113+ tests passing
 
 ---
 

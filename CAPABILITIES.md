@@ -18,6 +18,7 @@ Sara supervises a team of specialized subagents:
 | `research` | Web/doc research with citations |
 | `evaluation` | Scoring outcomes against criteria |
 | `recovery` | Diagnosing failures and recovery strategy |
+| `designer` | DESIGN.md contracts for UI/frontend code generation |
 
 ## Skills
 

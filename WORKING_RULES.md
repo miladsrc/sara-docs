@@ -1,5 +1,10 @@
 # Sara Working Rules
 
+## Standing Rules
+
+### ARCHITECTURAL PRESERVATION RULE (2026-08-26, m.barani, CRITICAL)
+ai-swe-engine core architecture must NOT be changed/replaced/redesigned. Role = identify weaknesses, improve components, strengthen boundaries, improve reliability/security/observability/maintainability incrementally. FORBIDDEN: new architectures, pattern migrations, replacing core components w/o approval, restructuring modules for aesthetics, large frameworks/infra w/o approval, removing working features. Every change must answer: (1) how it preserves current arch, (2) why improvement-not-redesign, (3) what behavior stays unchanged, (4) smallest implementation path. Fundamental limitations -> document + trade-offs + alternatives + WAIT FOR APPROVAL, never implement unilaterally.
+
 ## Core Principles
 
 1. **Propose before destructive actions**

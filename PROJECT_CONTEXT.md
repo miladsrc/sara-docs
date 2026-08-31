@@ -4,10 +4,11 @@
 
 ### 1. ai-swe-engine
 
-**Status:** Phase 1 Complete (2026-08-25)
-**Version:** 0.2.0
-**Tests:** 61 passing
+**Status:** Phase 2 SoD Design COMPLETE, Increment 1 Implemented (2026-08-26)
+**Version:** 0.2.0+
+**Tests:** 113+ passing
 **Repository:** https://github.com/miladsrc/ai-swe-engine
+**Latest commit:** 69c93b9
 
 #### What It Is
 An autonomous software engineering engine that:
@@ -25,21 +26,32 @@ An autonomous software engineering engine that:
 #### Phases (Master Plan)
 - Phase 0: Foundational agent loop (COMPLETE)
 - Phase 1: Governance integrity hardening (COMPLETE)
-- Phase 2: Separation of duties (NEXT)
+- Phase 2: Separation of duties (DESIGN COMPLETE, increment 1 done, SASE_SOD_MODE=legacy)
 - Phase 3: Semantic memory/Qdrant
 - Phase 4: Bounded self-repair/L1 autonomy
 - Phase 5: Redis (conditional)
 - Phase 6: L2 automation
 - Phase 7: L3 delegated engineering
 - Phase 8: L4 platform maturity
+- Phase 9: Platform UI / Human Operations Layer (DEFERRED)
+
+#### Key Components
+- **Verification Module** (agents/verification.py): Tree-hash binding, clean-checkout, orchestrator-owned test/scan/lint
+- **Governance Dashboard** (static/ui/, api/routers/dashboard.py): Zero-build vanilla JS, bearer auth
+- **Coder Agents**: Python + SpringBoot, propose_only mode for SoD strict
+- **Agent Layer**: 8 roles (product, spec, coder, reviewer, reflection, test_runner, springboot_coder, designer)
 
 #### Key Files
+- `agents/orchestrator.py` - Pipeline orchestration (legacy + strict SoD modes)
+- `agents/verification.py` - SoD verification steps (tree-hash, test, scan, lint)
+- `agents/coder_agent.py` - Python coder (propose_only support)
+- `agents/coder_springboot.py` - SpringBoot coder (propose_only support)
 - `api/gates.py` - Governance gates
-- `api/routers/crp.py` - CRP endpoint (Bug 1 fixed)
-- `api/routers/evidence.py` - Evidence export endpoint
-- `api/schemas.py` - Pydantic schemas
-- `tests/test_gates_unit.py` - Gate tests
+- `api/routers/dashboard.py` - Dashboard API
+- `api/security.py` - Auth (require_human_actor, require_authenticated_actor)
+- `static/ui/` - Dashboard UI (app.js, index.html, styles.css)
 - `docs/MASTER_PLAN.md` - Source of Truth
+- `docs/PHASES/PHASE-2.md` - SoD design doc
 
 ---
 
@@ -64,15 +76,6 @@ A human-in-the-loop agent with:
 - Audit trail logs all actions
 - Memory manager handles pgvector storage
 
-#### Key Components
-- `api/main.py` - FastAPI application
-- `api/graph.py` - LangGraph workflow
-- `api/gateway.py` - Gateway controller
-- `api/policy.py` - Policy engine
-- `api/approval.py` - Approval store
-- `api/audit.py` - Audit trail
-- `api/memory.py` - Memory manager
-
 ---
 
 ### 3. todo-cli
@@ -81,29 +84,35 @@ A human-in-the-loop agent with:
 **Built by:** ai-swe-engine agents
 **Repository:** IdeaProjects\todo-cli
 
-#### What It Is
-An example project built by the ai-swe-engine agent layer to demonstrate the full offline dev flow.
-
-#### Key Features
-- Built by agent:coder using qwen2.5-coder:7b
-- 4 reflection iterations
-- Real pytest tests
-- CLI actually works (add/list/--priority/TODO_STORE)
+An example project built by the ai-swe-engine agent layer to demonstrate the full offline dev flow. Built by agent:coder using qwen2.5-coder:7b, 4 reflection iterations, real pytest tests, CLI actually works.
 
 ---
 
-### 4. game-agent
+### 4. todo-springboot
+
+**Status:** Example project (2026-08-26)
+**Built by:** ai-swe-engine SpringBoot coder agent
+**Repository:** IdeaProjects\todo-springboot
+
+Full end-to-end Spring Boot example: auth, chat, calendar/reminders, SPA frontend. 16 tests pass (6 controller + 10 service).
+
+---
+
+### 5. demo-map-backend/frontend
+
+**Status:** Map demo (2026-08-26)
+**Built by:** ai-swe-engine with SoD strict mode
+
+SpringBoot backend + Angular 17 frontend for location CRUD. Both MRPs green, awaiting human approval.
+
+---
+
+### 6. game-agent
 
 **Status:** Completed (2026-08-23)
 **Repository:** IdeaProjects\game-agent
 
-#### What It Is
-A Chrome Dino game agent upgraded from vision-only to perfect-information "direct" mode.
-
-#### Key Achievements
-- Score 867 -> ~2400 consistent
-- Deterministic ceiling at score ~2377
-- User declined further tuning ("merge them, it won't get better")
+Chrome Dino game agent upgraded from vision-only to perfect-information "direct" mode. Score 867 -> ~2400 consistent.
 
 ---
 

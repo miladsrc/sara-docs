@@ -171,5 +171,91 @@ Fix two known bugs and add provenance tagging + evidence export.
 - MRPEvidenceUpdate schema accepts provenance field (human|tool|llm)
 - GET /evidence/run/{run_id} returns run details, MRP evidence, and audit trail
 - 3 regression tests added
-- All 61 tests passing
-- Version bumped to 0.2.0
+
+---
+
+## ADR-008: Separation of Duties (Phase 2 SoD)
+
+**Date:** 2026-08-26
+**Status:** Design Complete, Increment 1 Implemented
+**Context:** Phase 2 SoD - coder self-attestation risk
+
+### Decision
+
+Implement Separation of Duties behind SASE_SOD_MODE flag (legacy default). Coder becomes PROPOSAL-ONLY in strict mode; orchestrator owns verification via agents/verification.py with tree-hash content binding.
+
+### Rationale
+
+1. Self-certification risk: coder runs its own tests and certifies its own output
+2. No content binding between tested bytes and committed bytes
+3. Provenance misleading (ci:test-runner identity but agent-produced data)
+4. Self-authored tests can be gamed
+5. Reviewer agent absent (ai_review_status always null)
+
+### Design
+
+- Orchestrator-owned verification steps A-H (generate -> snapshot commit+tree hash -> independent test step in clean checkout -> scan same tree -> lint -> evidence PATCH w/ runner=orchestrator -> MRP -> CRP -> terminal)
+- Tree-hash content binding: HEAD^{tree} hash bound to evidence, test step FAILS CLOSED on drift
+- New gates: G7 (runner=orchestrator + tree_hash match required), G8 (ai_review presence)
+- Migration 004: MRP.verified_tree_hash column
+- Rollout: SASE_SOD_MODE=legacy default, strict flip after E2E validation
+
+### Consequences
+
+- Legacy path unchanged when flag unset
+- CoderAgent.implement_spec(propose_only=True) returns verification_pending=True
+- Orchestrator _sod_verify_and_package shared by CLI and demo scripts
+- AgentRunUpdate.status now Optional (proposal patches are non-terminal metadata)
+- 9 unit tests (drift fail-closed, checkout isolation, proposal-only never verifies)
+
+---
+
+## ADR-009: Governance Dashboard as Client Layer
+
+**Date:** 2026-08-26
+**Status:** Accepted, Implemented
+**Context:** Need for human-facing UI to manage governance workflow
+
+### Decision
+
+Build a pure client-layer dashboard served at /ui (zero-build vanilla JS, air-gap safe). No new trust boundary, no second auth system.
+
+### Rationale
+
+1. Need human-facing UI for approvals, audit, evidence chain
+2. Must not introduce new authorization system
+3. Must work air-gapped (no build tooling, no CDN)
+4. Bearer-first auth via require_authenticated_actor
+
+### Consequences
+
+- Backend: dashboard.py read-only router, require_authenticated_actor (bearer preferred)
+- UI: login, dashboard, Approval Center, Agent Runs, Evidence Chain, Audit, Projects, Console, Settings
+- Console records instructions to audit_log only; does NOT spawn agents
+- Dockerfile copies static/ui into image
+- Designer agent (agents/designer_agent.py) generates DESIGN.md contract
+
+---
+
+## ADR-010: Human Operating Layer Deferred to Phase 9
+
+**Date:** 2026-08-26
+**Status:** Accepted (DEFERRED)
+**Context:** Full human workspace/dashboard effort vs backend governance milestones
+
+### Decision
+
+Defer the complete Human Operating Layer (roles, assignments, My Tasks, notifications, team management) to Phase 9 — Platform UI / Human Operations Layer.
+
+### Rationale
+
+1. Auth and interim dashboard exist but full human workspace is a major frontend product effort
+2. Must not dilute backend governance milestones (Phases 0-8)
+3. Phase 9 gives it a formal home without disturbing existing phases
+
+### Consequences
+
+- Architectural concepts preserved in docs/HUMAN_OPERATING_LAYER_PROPOSAL.md
+- No migrations/endpoints/UI built from it until Phase 9
+- Prerequisites: Phases 1-4 stable, SoD complete, strict token mode ON
+- Pipeline-start API deliberately withheld until Phase 2 SoD restructures execution ownership
