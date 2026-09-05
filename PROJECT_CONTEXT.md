@@ -4,11 +4,12 @@
 
 ### 1. ai-swe-engine
 
-**Status:** Phase 2 SoD Design COMPLETE, Increment 1 Implemented (2026-08-26)
+**Status:** Phase 2 SoD largely implemented and pushed (2026-09-05)
 **Version:** 0.2.0+
-**Tests:** 113+ passing
+**Tests:** 158 passing (non-live), 3 skipped, 6 deselected
 **Repository:** https://github.com/miladsrc/ai-swe-engine
-**Latest commit:** 69c93b9
+**Latest commit:** d2f6703
+**Mode:** SASE_SOD_MODE=strict (live + docker-compose)
 
 #### What It Is
 An autonomous software engineering engine that:
@@ -16,17 +17,19 @@ An autonomous software engineering engine that:
 - Implements deterministic governance (gates, audit, identity)
 - Requires human approval at critical decision points
 - Never depends on Sara at runtime
+- Enforces Separation of Duties via independent subprocesses (Coder ≠ Verifier ≠ Reviewer ≠ Human)
 
 #### Architecture
 - FastAPI + PostgreSQL
 - PRD -> US -> AC -> Spec -> AgentRun -> CRP -> MRP -> VCR chain
-- Hard gates at each stage
+- Hard gates at each stage (incl. SoD gates G7 verifier tree-hash binding, G8 reviewer ownership)
 - Deterministic governance, LLM generates content only
+- Agents communicate ONLY through the engine API + git (never point-to-point) — proven live by scripts/trace_coder_verifier.py
 
 #### Phases (Master Plan)
 - Phase 0: Foundational agent loop (COMPLETE)
 - Phase 1: Governance integrity hardening (COMPLETE)
-- Phase 2: Separation of duties (DESIGN COMPLETE, increment 1 done, SASE_SOD_MODE=legacy)
+- Phase 2: Separation of duties (mostly IMPLEMENTED: verification module, verifier subprocess, reviewer G8, G7 gate, offline workflow; genuine remote boundary BLOCKED)
 - Phase 3: Semantic memory/Qdrant
 - Phase 4: Bounded self-repair/L1 autonomy
 - Phase 5: Redis (conditional)
@@ -36,29 +39,45 @@ An autonomous software engineering engine that:
 - Phase 9: Platform UI / Human Operations Layer (DEFERRED)
 
 #### Key Components
-- **Verification Module** (agents/verification.py): Tree-hash binding, clean-checkout, orchestrator-owned test/scan/lint
-- **Governance Dashboard** (static/ui/, api/routers/dashboard.py): Zero-build vanilla JS, bearer auth
-- **Coder Agents**: Python + SpringBoot, propose_only mode for SoD strict
-- **Agent Layer**: 8 roles (product, spec, coder, reviewer, reflection, test_runner, springboot_coder, designer)
-- **Auth** (api/authn.py, api/routers/auth.py): Token-based login, PBKDF2 200k, /auth/login + /auth/me
+- **Independent Verifier subprocess** (agents/verifier.py): role ci:verifier, own token (SASE_VERIFIER_TOKEN), claims verification requests, clean-checkout verification, authoritative tree hash — orchestrator never holds verifier credentials
+- **Independent Reviewer agent** (agents/reviewer.py, agents/critic.py): role agent:reviewer, PATCH /mrps/{id}/review, drives gate G8
+- **Verification requests** (api/routers/verification_requests.py): immutable envelopes (run/mrp/commit/worktree), atomic claim, fail-closed TTL
+- **SoD gates** (api/gates.py): G7 (verifier-owned evidence tree hash == MRP.verified_tree_hash), G8 (reviewer-owned completed review)
+- **Offline workflow runner** (scripts/offline_runner.py): host FastAPI on :8899, Blueprint -> PRD->…->artifact, artifact download
+- **Verification Module** (agents/verification.py): tree-hash binding, clean-checkout, test/scan/lint steps
+- **Governance Dashboard** (static/ui/, api/routers/dashboard.py): zero-build vanilla JS, bearer auth, SoD validation view
+- **Coder Agents**: Python + SpringBoot, propose_only mode in strict SoD
+- **Agent Layer**: product, spec, coder, reviewer, critic, verifier, test_runner, springboot_coder, designer, orchestrator
+- **Auth** (api/authn.py, api/routers/auth.py): token-based login, PBKDF2 200k; strict CI/verifier/reviewer actor checks
+- **Comms trace**: SASE_ENGINE_TRACE=1 opt-in [comms] tracing in EngineClient (never logs headers/tokens)
 
 #### Key Files
-- `agents/orchestrator.py` - Pipeline orchestration (legacy + strict SoD modes)
-- `agents/verification.py` - SoD verification steps (tree-hash, test, scan, lint)
-- `agents/coder_agent.py` - Python coder (propose_only support)
-- `agents/coder_springboot.py` - SpringBoot coder (propose_only support)
-- `api/gates.py` - Governance gates
-- `api/routers/dashboard.py` - Dashboard API
-- `api/security.py` - Auth (require_human_actor, require_authenticated_actor)
-- `api/authn.py` - Token authentication (PBKDF2)
-- `static/ui/` - Dashboard UI (app.js, index.html, styles.css)
+- `agents/orchestrator.py` - Pipeline orchestrator + `_sod_verify_and_package` (SoD coordinator)
+- `agents/verifier.py` - Independent verifier subprocess (--claim runner mode + stdin mode)
+- `agents/reviewer.py` / `agents/critic.py` - G8 reviewer + reflection/critic boundaries
+- `agents/verification.py` - verification steps (tree-hash, clean-checkout, test, scan, lint)
+- `agents/scanner.py` - neutral security scanner
+- `agents/coder_agent.py` - Python coder (propose_only, deterministic PR numbers)
+- `agents/coder_springboot.py` - SpringBoot coder
+- `agents/engine_client.py` - API client (role allowlists w/ wildcard policy, comms trace)
+- `api/gates.py` - Governance gates (incl. G7/G8)
+- `api/routers/verification_requests.py` - verification request lifecycle
+- `api/routers/review.py` - reviewer PATCH endpoint
+- `api/security.py` - actor auth (human/CI/verifier/reviewer)
+- `scripts/trace_coder_verifier.py` - LIVE Coder↔Verifier communication demo
+- `scripts/offline_runner.py` - host offline workflow runner
+- `static/ui/` - Dashboard UI
 - `docs/MASTER_PLAN.md` - Source of Truth
-- `docs/PHASES/PHASE-2.md` - SoD design doc
+- `docs/ADR/ADR-002-genuine-sod-isolation.md` - real SoD boundary decision + addendum
 
 #### Known Issues
-- CRP endpoint can set run.status='blocked' bypassing assert_run_patchable (engine bug)
+- Genuine remote verifier SoD boundary BLOCKED (needs separately-administered infra outside m.barani control; local harness mechanics proven only — ADR-002 addendum)
+- offline_runner invokes reviewer with --offline -> TemplateLLM no review output -> no review PATCH -> G8 never completes (LIVE-blocker for full pipeline demo)
+- deepseek-r1:8b times out on CPU-only machine; working models = qwen2.5-coder:7b and qwen2.5:7b
+- Codegen quality is the current bottleneck (7b consistently fails its own tests in demo runs — the verifier correctly rejects; proven by comms-trace demo)
 - MRP open_crp_ids snapshot misses CRPs raised AFTER MRP creation (display stale, safety holds)
 - Blueprint table has no API endpoint — must INSERT directly into Postgres
+- Scratch files untracked in workdir: examine_db.py, query_todos*.py, search_*.py, sessions_with_todos.py, offline_runs/, tests/my-blueprint.txt
 
 ---
 

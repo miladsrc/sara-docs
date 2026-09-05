@@ -2,6 +2,67 @@
 
 ---
 
+## 2026-09-05
+
+### Major Updates
+- **REAL Coder↔Verifier communication trace demo**: SASE_ENGINE_TRACE=1 opt-in [comms] tracing in agents/engine_client.py + scripts/trace_coder_verifier.py live end-to-end demo (seed -> CoderAgent -> MRP -> verification request -> ci:verifier claim/evidence/complete -> G7 verdict -> check-ready)
+- **3 REAL integration bugs fixed** (found live during the demo):
+  1. claim response dropped `worktree_ref` -> verifier KeyError (schemas + _row_to_schema)
+  2. `_assert_allowed` mid-path wildcards unsupported (now exactly-one-segment `[^/]+`; fixes verifier `/*/complete`, reviewer/critic `/*/review`)
+  3. `_pseudo_pr_number` collisions in a 30k space -> sha1(spec_id|run_id) stable hash
+- **LIVE RESULTS**: G7 ACCEPTS (verifier-owned evidence tree == MRP.verified_tree_hash); real check-ready correctly blocks on "unit tests not passing" + "AI review not completed" (G8); all 3 demo codegens REJECTED by verifier — machinery working, codegen quality = confirmed #1 risk (bottleneck is not the plumbing)
+- **3 commits pushed** to miladsrc/ai-swe-engine, tip d2f6703: 5f0a37d (comms-trace), 88a4380 (swe-help tool + .gitignore), d2f6703 (docs: README env table + trace section, CHANGELOG, PROGRESS/2026-09-05)
+- Suite: 158 passed, 3 skipped, 6 deselected
+
+### Files synced in this repo
+- memory/sara.md: appended 2026-08-31, 09-01, 09-02, 09-05 sessions
+- MEMORY.md: 4 new session sections + refreshed Key Facts / Current State
+- PROJECT_CONTEXT.md: ai-swe-engine status -> Phase 2 SoD largely implemented, new components (verifier/reviewer subprocesses, verification requests, offline runner, comms trace), updated known issues
+
+---
+
+## 2026-09-02
+
+### Major Updates
+- **SASE project report**: docs/SASE_PROJECT_REPORT.md (beginner-level, AI-friendly, for Word conversion)
+- **swe-help tool built + verified**: pure-stdlib blueprint→code local-AI helper (./swe-help-out/, --verify via pytest isolated copy); 2 live generations PASS (3/3 tests)
+- Model reality confirmed: deepseek-r1:8b times out on CPU; qwen2.5-coder:7b / qwen2.5:7b are the workhorses
+- Blocker found: offline_runner reviewer --offline -> TemplateLLM no review output -> no review PATCH -> G8 never completes
+
+---
+
+## 2026-09-01
+
+### Major Updates
+- Phase 2 SoD completed: independent Verifier subprocess (G7) + Reviewer agent (G8)
+- Offline user-facing workflow built: host offline runner + Blueprint UI + Dev dashboard
+- Coder model switched 14b -> 7b (14b unreliable on CPU-only Ollama)
+- 2 reasoned commits pushed to origin (tip 0032cd5): 4127e0f (SoD/G8/verifier), 0032cd5 (offline workflow)
+- Full non-live suite: 155 passed, 3 skipped, 6 deselected (legacy env)
+- Genuine remote GitLab verifier boundary remains BLOCKED (local harness only)
+
+### Added
+- scripts/offline_runner.py: host-side FastAPI runner (port 8899) driving the governed
+  lifecycle (Blueprint -> PRD/US/AC -> Spec -> Coder -> Verifier/G7 -> Reviewer/G8 -> artifact)
+- static/ui Blueprint authoring view + Dev dashboard (live stage timeline, artifact download, trace)
+- blueprints/test/BP-TEST-FULLSTACK-001.md: difficult offline full-stack validation blueprint
+- agents/verifier.py: independent ci:verifier subprocess (authoritative tree hash, LLM-free)
+- agents/reviewer.py + agents/critic.py: G8 reviewer + reflection/critic boundaries
+- agents/scanner.py: neutral security scanner (extracted)
+- api/routers/review.py + api/routers/verification_requests.py
+- migrations/005_mrps_verified_tree_hash.sql, 006_verification_requests.sql, 007_reviewer.sql
+- tests/test_sod_g7.py, test_sod_g8.py, test_sod_verifier.py, test_sod_remote_boundary.py
+- agents/coder_prompts.py + coder_agent.py generalization (spec target_files + MRP metadata)
+
+### Changed
+- api/security.py: require_reviewer_actor, require_verifier_actor, fail-closed token enforcement
+- api/gates.py: G7 (verifier tree-hash binding) + G8 (reviewer-owned completed review) gates
+- agents/config.py: coder model qwen2.5-coder:7b; reviewer/critic deepseek-r1:8b (different families)
+- scripts/offline_runner.py _role_models coder -> qwen2.5-coder:7b
+- tests/test_sod_g8.py: reconciled coder model assertion (G8 model-difference invariant preserved)
+
+---
+
 ## 2026-08-26
 
 ### Major Updates

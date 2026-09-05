@@ -1,7 +1,7 @@
 # Sara - Supervisor Meta-Agent
 
-> **Version:** 2.0
-> **Date:** 2026-08-26
+> **Version:** 2.1
+> **Date:** 2026-09-05
 > **Status:** Active
 
 ---
@@ -201,6 +201,27 @@ Complete export of Sara's knowledge, identity, memory, and capabilities. Can be 
 - Phase 2 token migration COMPLETE
 - E2 gate confirmed: LLM runtime 100% local
 - 113+ tests passing
+
+### 2026-08-31
+- G7 gate (verifier evidence + tree hash binding) implemented; strict mode landed
+- ADR-002: genuine SoD isolation decision (independent verifier/reviewer subprocesses)
+- Independent verifier subprocess built (ci:verifier, own token, orchestrator excluded)
+- Genuine remote boundary studies: BLOCKED under current topology (documented, no fakes)
+
+### 2026-09-01
+- G8 reviewer agent + critic implemented; offline workflow runner + Blueprint UI built
+- Coder model fixed: qwen2.5-coder:14b unreliable on CPU -> back to 7b
+- 2 commits pushed (SoD/G8 + offline workflow), tip 0032cd5
+
+### 2026-09-02
+- SASE project report written (docs/SASE_PROJECT_REPORT.md)
+- swe-help tool built + verified live (blueprint -> code, 2 passing generations)
+
+### 2026-09-05
+- REAL Coder↔Verifier communication trace demo (SASE_ENGINE_TRACE + scripts/trace_coder_verifier.py)
+- 3 integration bugs fixed live (worktree_ref, mid-path wildcards, PR collisions)
+- G7 ACCEPTS verified live; verifier correctly rejected 7b codegen (system working)
+- 3 commits pushed, tip d2f6703; 158 tests passing
 
 ---
 

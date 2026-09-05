@@ -259,3 +259,31 @@ Defer the complete Human Operating Layer (roles, assignments, My Tasks, notifica
 - No migrations/endpoints/UI built from it until Phase 9
 - Prerequisites: Phases 1-4 stable, SoD complete, strict token mode ON
 - Pipeline-start API deliberately withheld until Phase 2 SoD restructures execution ownership
+
+---
+
+## ADR-011: Genuine SoD Isolation (Real Agent/Process Separation)
+
+**Date:** 2026-08-31
+**Status:** Accepted (incremental implementation; remote boundary BLOCKED)
+**Context:** Owner decision — Phase 2 SoD must be genuine separation, not logical classes/prompts in one process (ADR-011 supersedes ADR-008's orchestrator-owned verification design; ADR-008 history preserved)
+
+### Decision
+
+Move to REAL agent/process isolation: `User → Orchestrator → Coder → Independent Verifier subprocess → G7 → Independent Reviewer subprocess → G8 → Human → Merge`. Rule: `Coder ≠ Verifier ≠ Reviewer ≠ Human`. Full record in ai-swe-engine `docs/ADR/ADR-002-genuine-sod-isolation.md` (+ addendum).
+
+### Rationale
+
+1. Orchestrator-owned verification was still self-attestation in one process
+2. Evidence provenance must be owned by a distinct credentialed identity
+3. Orchestrator must NOT hold verifier credentials (no god-process)
+
+### Consequences
+
+- Verifier + Reviewer run as separate subprocesses with own identity + credentials (`ci:verifier` / `agent:reviewer`, SASE_VERIFIER_TOKEN / SASE_REVIEWER_TOKEN)
+- Orchestrator coordinates via immutable verification requests; never reads verifier token; never writes verifier evidence
+- G7 trusts verifier-owned evidence tree hash == MRP.verified_tree_hash; G8 requires reviewer-owned completed review
+- Security scanner extracted to neutral agents/scanner.py
+- GENUINE REMOTE BOUNDARY VERDICT BLOCKED (2026-08-31): same-local-admin user + Docker daemon control make all local credentials forgeable; remote GitLab runner requires infra/authority outside m.barani (repo not on gitlab.sidg.ir; m.barani = Developer)
+- Local harness (migration 006 verification_requests + claim/complete endpoints + verifier --claim) proves protocol mechanics only
+- Live comms evidence of the real chain: scripts/trace_coder_verifier.py (2026-09-05), SASE_ENGINE_TRACE=1

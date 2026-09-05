@@ -1,7 +1,7 @@
 # Sara Complete Memory
 
-> **Last Updated:** 2026-08-26
-> **Total Entries:** 77 lines
+> **Last Updated:** 2026-09-05
+> **Total Entries:** ~150 lines
 > **Source:** `~/.config/opencode/memory/sara.md`
 
 ---
@@ -119,10 +119,48 @@
 
 ---
 
+### 2026-08-31
+
+- **Phase 2 P0 G7 IMPLEMENTED**: migration 005 `mrps.verified_tree_hash`, G7 gate (verifier evidence + tree binding), SASE_SOD_MODE=strict landed, G7 tests + live pass
+- **ADR-002 GENUINE SoD ISOLATION** (owner decision): Phase 2 = REAL process separation — independent Verifier + Reviewer subprocesses, own credentials; orchestrator never holds verifier creds (no god-process)
+- **INDEPENDENT VERIFIER SUBPROCESS landed**: agents/verifier.py (ci:verifier), scanner extracted, require_verifier_actor, orchestrator rewritten as coordinator (P0 Step 2)
+- **Credential/remote-boundary studies (2a-2C)**: VERDICT — no genuine boundary under current topology (same local-admin user; Docker daemon controls tokens). Remote GitLab runner: BLOCKED (repo not on gitlab, m.barani = Developer only)
+- **Local harness built** (approved Option 2, mechanics only): verification_requests table + claim/complete endpoints + verifier --claim mode; 144 tests passed; genuine boundary verdict stays BLOCKED
+
+---
+
+### 2026-09-01
+
+- **G8 REVIEWER AGENT IMPLEMENTED**: agents/reviewer.py (agent:reviewer, deepseek-r1:8b) + critic.py + migration 007 + PATCH /mrps/{id}/review + G8 gate
+- **MODEL REALITY FIX**: qwen2.5-coder:14b unreliable on CPU -> back to 7b; deepseek-r1:8b times out >240s; qwen2.5:7b = viable reviewer fallback
+- **OFFLINE WORKFLOW BUILT**: scripts/offline_runner.py (host :8899) + Blueprint UI + Dev dashboard; artifact download
+- **2 commits PUSHED** tip 0032cd5: 4127e0f (SoD/G8/verifier), 0032cd5 (offline workflow)
+- Suite: 155 passed, 3 skipped (legacy); strict mode = 3 pre-existing gate tests need env
+
+---
+
+### 2026-09-02
+
+- **SASE PROJECT REPORT**: docs/SASE_PROJECT_REPORT.md (beginner-level, for Word conversion)
+- **swe-help TOOL BUILT + VERIFIED**: stdlib blueprint→code helper (./swe-help-out/, --verify), 2 live generations PASS
+- **Blocker found**: offline_runner reviewer --offline => no review PATCH => G8 never completes
+
+---
+
+### 2026-09-05
+
+- **REAL Coder↔Verifier communication trace demo** — SASE_ENGINE_TRACE=1 [comms] tracing + scripts/trace_coder_verifier.py live end-to-end demo (seed→coder→MRP→verification-request→claim→evidence→complete→G7→check-ready)
+- **3 REAL INTEGRATION BUGS FIXED**: (1) worktree_ref missing from claim; (2) mid-path wildcards in _assert_allowed; (3) _pseudo_pr_number collisions (sha1 fix)
+- **LIVE RESULTS**: G7 ACCEPTS (verifier-owned tree binding); check-ready correctly blocks on unit tests + G8; all 3 codegens REJECTED by verifier (system working, codegen = #1 risk confirmed)
+- **3 commits PUSHED** tip d2f6703: 5f0a37d (comms-trace), 88a4380 (swe-help), d2f6703 (docs)
+- Suite: 158 passed, 3 skipped, 6 deselected
+
+---
+
 ## Key Facts
 
 ### Projects
-- **ai-swe-engine**: Phase 2 SoD design COMPLETE, increment 1 done. Phase 0+1+Human Identity COMPLETE. 113+ tests passing. Version 0.2.0+
+- **ai-swe-engine**: Phase 0+1+Human Identity COMPLETE. Phase 2 SoD: verifier subprocess (G7) + reviewer (G8) + offline workflow IMPLEMENTED and pushed; comms-trace demo delivered 2026-09-05. 158 tests passing. Version 0.2.0+
 - **SARA v2**: MCP-based human-in-the-loop agent, Docker stack running. Default runtime for Level 1+ actions.
 - **todo-cli**: Example project built by ai-swe-engine agents
 - **demo-map-backend/frontend**: Map demo projects (SpringBoot + Angular), MRPs green
@@ -138,27 +176,27 @@
 - ADR-005: Token auth now, OIDC deferred
 - ADR-006: Sara v2 is default runtime (Level 1+ through Gateway)
 - ADR-007: Phase 1 bugs fixed (CRP assert_run_patchable, MRP live CRP query)
-- ADR-008: Separation of Duties (Phase 2 SoD, SASE_SOD_MODE=legacy default)
+- ADR-008: Separation of Duties (Phase 2 SoD)
 - ADR-009: Governance Dashboard as Client Layer
 - ADR-010: Human Operating Layer deferred to Phase 9
+- ADR-011: Genuine SoD isolation (independent verifier/reviewer subprocesses, ADR-002 addendum)
 
-### Current State (as of 2026-08-26)
-- ai-swe-engine: Phase 0+1+Identity COMPLETE, Phase 2 SoD design COMPLETE + increment 1
+### Current State (as of 2026-09-05)
+- ai-swe-engine: Phase 0+1+Identity COMPLETE; Phase 2 SoD largely implemented (verifier subprocess G7, reviewer G8, offline workflow), tested and pushed
 - SARA v2: Default runtime, Gateway pipeline active
-- Memory: 77 lines of session history
-- Tests: 113+ passing
-- Version: 0.2.0+
-- Latest commit: 69c93b9 (pushed to github miladsrc/ai-swe-engine)
-- Dashboard: Live at /ui, zero-build vanilla JS, black/gold + blue/white theme
-- SoD: SASE_SOD_MODE=legacy default, strict behind flag, E2E validated
-- Phase 9: DEFERRED (Human Operating Layer)
-- LLM: 100% local — qwen2.5-coder:7b via Ollama, no cloud dependencies
+- Tests: 158 passing (ai-swe-engine, non-live)
+- Latest commit: d2f6703 (pushed to github miladsrc/ai-swe-engine)
+- Demo: scripts/trace_coder_verifier.py proves live Coder↔Verifier communication; G7 verified working
+- Strict mode: SASE_SOD_MODE=strict live + compose; SASE_VERIFIER_TOKEN / SASE_REVIEWER_TOKEN set
+- LLM: 100% local — qwen2.5-coder:7b (coder), deepseek-r1:8b configured (but times out on CPU; qwen2.5:7b fallback)
+- Real comms trace: SASE_ENGINE_TRACE=1
 
 ### Known Issues / Open Items
-- CRP endpoint can set run.status='blocked' bypassing assert_run_patchable (engine bug, unfixed)
+- Genuine remote verifier SoD boundary still BLOCKED (requires separately-administered infra — ADR-002 addendum)
+- offline_runner reviewer --offline => no review PATCH => G8 never completes (LIVE-blocker for full pipeline demo, still open)
+- deepseek-r1:8b unreliable on this CPU-only machine (times out); 7b models are the workhorses
+- CRP endpoint can set run.status='blocked' bypassing assert_run_patchable (older engine bug — superseded by later hardening/verifier architecture)
 - MRP open_crp_ids snapshot misses CRPs raised AFTER MRP creation (display stale, safety holds)
 - Blueprint table has no API endpoint — must INSERT directly into Postgres
-- Sister session's files uncommitted: agents/config.py (+designer role), designer_agent.py, SPRINGBOOT-TODO-SESSION-REPORT.md
-- Ollama install needs workdir=gguf dir (no --workdir flag)
-- DNS poisoning risk: OpenVPN TAP adapter may re-assert on reconnect
+- Scratch files untracked in ai-swe-engine workdir: examine_db.py, query_todos*.py, search_*.py, sessions_with_todos.py, offline_runs/, tests/my-blueprint.txt
 - SMB client registry changes still PENDING REVERT

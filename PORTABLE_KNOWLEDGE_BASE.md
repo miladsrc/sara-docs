@@ -1,7 +1,7 @@
 # Sara Portable Knowledge Base
 
-> **Version:** 2.0
-> **Date:** 2026-08-26
+> **Version:** 2.1
+> **Date:** 2026-09-05
 > **Purpose:** Make Sara's knowledge portable across environments
 
 ---
@@ -44,18 +44,18 @@ Read the files in this package to understand Sara's context and continue her wor
 sara-portable/
 ├── README.md                    # This file
 ├── IDENTITY.md                  # Sara's identity and persona
-├── MEMORY.md                    # Complete session history (77 lines, 2026-08-26)
+├── MEMORY.md                    # Complete session history (~150 lines, 2026-09-05)
 ├── CAPABILITIES.md              # Skills and agent roster
 ├── WORKING_RULES.md             # How Sara operates
 ├── PROJECT_CONTEXT.md           # Projects Sara has worked on
-├── ARCHITECTURE_DECISIONS.md    # 10 ADRs
+├── ARCHITECTURE_DECISIONS.md    # 11 ADRs
 ├── ARCHITECTURE.md              # Trust boundaries diagram
 ├── CHANGELOG.md                 # Documentation changelog
 ├── PORTABLE_KNOWLEDGE_BASE.md   # This file
 ├── config/
 │   └── AGENTS.md               # opencode agent configuration
 ├── memory/
-│   └── sara.md                 # Sara's persistent memory file (77 lines)
+│   └── sara.md                 # Sara's persistent memory file (~150 lines)
 ├── skills/
 │   └── read-terminals/         # Terminal monitoring skill
 │       ├── SKILL.md
@@ -87,7 +87,7 @@ cp -r sara-docs/skills/* ~/.config/opencode/skills/
 
 ---
 
-## What Sara Knows (As of 2026-08-26)
+## What Sara Knows (As of 2026-09-05)
 
 ### Identity
 - Sara is a supervisor meta-agent ("god agent")
@@ -96,7 +96,7 @@ cp -r sara-docs/skills/* ~/.config/opencode/skills/
 - SARA v2 is the default runtime for Level 1+ actions
 
 ### Projects Managed
-- **ai-swe-engine**: Phase 0+1+Identity COMPLETE, Phase 2 SoD design COMPLETE + increment 1 done. 113+ tests passing. Version 0.2.0+
+- **ai-swe-engine**: Phase 0+1+Identity COMPLETE; Phase 2 SoD largely implemented (verifier G7, reviewer G8, offline workflow) and pushed. 158 tests passing. Version 0.2.0+
 - **SARA v2**: MCP-based human-in-the-loop agent, Docker stack running at 127.0.0.1:8800
 - **todo-cli**: Example project built by ai-swe-engine agents
 - **todo-springboot**: Spring Boot example, 16 tests pass
@@ -114,21 +114,25 @@ cp -r sara-docs/skills/* ~/.config/opencode/skills/
 - ADR-008: Separation of Duties (Phase 2 SoD)
 - ADR-009: Governance Dashboard as Client Layer
 - ADR-010: Human Operating Layer deferred to Phase 9
+- ADR-011: Genuine SoD isolation (independent verifier/reviewer subprocesses)
 
 ### Current State
-- ai-swe-engine: Phase 0+1+Identity COMPLETE, Phase 2 SoD design COMPLETE + increment 1
+- ai-swe-engine: Phase 2 SoD largely implemented (verifier subprocess G7, reviewer G8, offline workflow), 158 tests passing
 - SARA v2: Default runtime, Gateway pipeline active
-- Memory: 77 lines of session history
-- Tests: 113+ passing
+- Memory: ~150 lines of session history
+- Tests: 158 passing (non-live), 3 skipped
 - Version: 0.2.0+
-- Latest commit: 69c93b9 (pushed to github miladsrc/ai-swe-engine)
-- Dashboard: Live at /ui, zero-build vanilla JS
-- SoD: SASE_SOD_MODE=legacy default, strict behind flag, E2E validated
+- Latest commit: d2f6703 (pushed to github miladsrc/ai-swe-engine)
+- Live comms demo: scripts/trace_coder_verifier.py proves real Coder↔Verifier communication; SASE_ENGINE_TRACE=1
+- SoD: SASE_SOD_MODE=strict live + compose; SASE_VERIFIER_TOKEN / SASE_REVIEWER_TOKEN set
 - Phase 9: DEFERRED (Human Operating Layer)
-- LLM: 100% local — qwen2.5-coder:7b via Ollama, no cloud dependencies
+- LLM: 100% local — qwen2.5-coder:7b (coder) + qwen2.5:7b (reviewer fallback); deepseek-r1:8b times out on CPU
 
 ### Known Issues
-- CRP endpoint can set run.status='blocked' bypassing assert_run_patchable (engine bug)
+- Genuine remote verifier SoD boundary BLOCKED (needs separately-administered infra — ADR-002 addendum)
+- offline_runner reviewer --offline => no review PATCH => G8 never completes (open blocker)
+- deepseek-r1:8b unreliable on CPU-only machine (times out)
+- Codegen quality is the bottleneck (7b fails its own tests; verifier correctly rejects)
 - MRP open_crp_ids snapshot misses post-MRP CRPs (display stale, safety holds)
 - Blueprint table has no API endpoint — must INSERT directly into Postgres
 - DNS poisoning risk: OpenVPN TAP adapter may re-assert on reconnect
