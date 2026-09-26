@@ -1,0 +1,7 @@
+# JetBrains IDE state — intentionally untracked (see README "Not part of Sara")
+.idea/
+*.iml
+
+# OS noise
+Thumbs.db
+.DS_Store

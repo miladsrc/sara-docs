@@ -32,6 +32,12 @@ for the in-place versioning decision (001).
 - **SARA_SELF_BOUNDARY.md** — rules for when Sara may modify herself.
 - **SARA_TELEMETRY_CONTRACT.md** — telemetry event interface (producer/consumer boundary).
 
+## Exam series — examiner records
+
+- **SARA_EXAMS.md** — the `dotin-10day-challenges` exam series: exam map, the EXAM-01
+  grading record (25/100 technical, official 0 for an uncommitted submission), the
+  examiner probe method, the candidate development plan, and durable environment facts.
+
 ## Cleanup output (2026-08-30)
 
 - `SARA_ARCHITECTURE_CLEANUP_FINAL_REPORT.md` — final report + regression matrix + duplication audit + truth table.
