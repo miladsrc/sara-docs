@@ -31,7 +31,7 @@ Path: `C:\Users\m.barani\.config\opencode` — exists.
 |---|---|
 | git tracking | **not a git repository** (no history, no rollback) |
 | `opencode.jsonc` | 5 lines: `$schema`, `default_agent: sara`, `instructions: [AGENTS.md]` |
-| `AGENTS.md` | 105 lines / 5300 B; carries the Sara-v2 bridge, the sara-docs pointer, and (since 2026-10-26) the smallest-complete-change policy |
+| `AGENTS.md` | 109 lines / 5536 B; carries the Sara-v2 bridge, the sara-docs pointer, the smallest-complete-change policy, and the repo/CI fact |
 | `agent/` | 14 files: `sara`, `hmyar` (both primary) + 12 subagents |
 | subagents | `orchestrator`, `router`, `planner`, `discovery`, `coding`, `database`, `testing`, `security`, `review`, `research`, `evaluation`, `recovery` |
 | `skills/` | 11 skills — `read-terminals`, `sara-review`, `sara-debt` plus `backend-dev`, `ci-cd`, `docker-stack-op`, `frontend-dev`, `git-hygiene`, `report-builder`, `test-verify`, `ui-ux` |
@@ -87,7 +87,7 @@ those corrections.
 | `plugin/sara.js` + `test/` with 4/4 passing tests | neither exists; only `plugins/postman.ts` |
 | 3 skills: read-terminals, sara-review, sara-debt | 9 skills on 2026-10-25 (none of the three named beyond `read-terminals`). **2026-10-26:** `sara-review` and `sara-debt` now exist — added deliberately, in a different form, and recorded in ADR-002; the archive claim was still false when it was read |
 | Agents `architect`, `reviewer`, `auditor` | absent; the 14 agents listed above exist instead |
-| AGENTS.md is 117 lines after cleanup | 55 lines on 2026-10-25; 105 lines after the 2026-10-26 policy addition |
+| AGENTS.md is 117 lines after cleanup | 55 lines on 2026-10-25; 105 lines after the 2026-10-26 policy addition, 109 after the same-day config sync |
 | Telemetry recorded to `state/tool-events.ndjson` | no `state/` directory; nothing records |
 | Golden evaluation is an active loop | one G5 result exists, from another host; not re-run here |
 
