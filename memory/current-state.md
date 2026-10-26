@@ -49,6 +49,22 @@ Path: `C:\Users\m.barani\.config\opencode` — exists.
   Level 1+ actions run directly and must disclose the bypass.
   **OBSERVED** (single port probe, not a startup attempt).
 
+### Repository and CI (verified 2026-10-26)
+
+- **FACT**: remote `origin` = `https://github.com/miladsrc/sara-docs.git`, single
+  branch `main` (default), working tree clean at `9570edf` before this record.
+- **FACT**: `.github/workflows/docs-gate.yml` runs `pytest tests -q` +
+  `scripts/validate_docs.py` on push/PR; the run for `a688e9c` **succeeded**
+  (checked via the GitHub API, not assumed).
+- **FACT**: the remote also held an unrelated legacy branch `master`
+  (`548ca66`, portable-knowledge-base design, 2026-08-25..09-05) with no common
+  ancestor. Reviewed file by file: nothing unique survived (its `memory/sara.md`
+  is contained in the live memory archive; `scripts/load_sara.py` was a
+  config-mirroring hazard; the ADRs/CHANGELOG describe the Sara v2 /
+  ai-swe-engine platform, not this repo). Retired 2026-10-26: annotated tag
+  `archive/master-2026-09-05` pushed, remote and local `master` deleted.
+- **Restore if ever needed:** `git push origin archive/master-2026-09-05:refs/heads/master`.
+
 ### Other verified facts
 
 - **FACT**: this repo's git tip before this work was `2c6b77a` (6 commits,
