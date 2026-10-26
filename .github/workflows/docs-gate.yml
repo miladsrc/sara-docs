@@ -1,0 +1,31 @@
+# Documentation gate.
+#
+# Runs on push and pull requests against the GitHub remote
+# (github.com/miladsrc/sara-docs, added 2026-10-26). The workflow definition is
+# committed; whether a given run passed is only known from the Actions tab or the
+# API — see memory/current-state.md for verified state.
+name: docs-gate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Validator tests
+        run: python -m pytest tests -q
+
+      - name: Validate documentation structure
+        run: python scripts/validate_docs.py

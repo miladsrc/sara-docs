@@ -1,64 +1,73 @@
-# sara-docs
+# sara-docs — Sara's operating manual
 
-Navigation entry for Sara (opencode supervisor meta-agent) documentation.
+The knowledge base that governs **how Sara does software development**: which
+workflow a task follows, which agent handles which stage, what evidence counts
+as proof, and when work may not proceed.
 
-> Still in progress: this README is updated as the architecture-cleanup (2026-08-30) lands its final reports.
+This is not a report archive. Reports describe what already happened; these
+files decide what happens next.
 
-## The live Sara — where the real thing lives
+**Verified: 2026-10-25** · host `m.barani` · opencode `v2.1.4`
 
-Sara's **runtime self is version-controlled in-place at
-`C:\Users\98903\.config\opencode`** (git repo `82c89c4`): AGENTS.md policy,
-`opencode.jsonc` + `tui.json` runtime config, `command/`, `agent/`, `skills/`,
-`plugin/sara.js`, `memory/sara.md`, `test/`. This directory is the source of
-truth and the only live copy — do not edit mirrored docs expecting them live.
-Telemetry lives in `state/tool-events.ndjson` (unversioned runtime artifact).
+## Start here
 
-This repo is the **accompanying documentation/analysis layer** (navigation,
-system map, decision ledger, golden tasks + results) — see `SARA-DECISIONS.md`
-for the in-place versioning decision (001).
+| You want to… | Read | Then |
+|---|---|---|
+| understand what Sara is and may touch | [architecture/SELF-BOUNDARY.md](architecture/SELF-BOUNDARY.md) | [architecture/SYSTEM-MAP.md](architecture/SYSTEM-MAP.md) |
+| know how a task gets classified and gated | [architecture/OPERATING-MODEL.md](architecture/OPERATING-MODEL.md) | [workflows/delegation.md](workflows/delegation.md) |
+| build a feature | [workflows/feature.md](workflows/feature.md) | dispatch from [roster/README.md](roster/README.md) |
+| fix a bug | [workflows/bugfix.md](workflows/bugfix.md) | — |
+| change a schema or migration | [workflows/db-migration.md](workflows/db-migration.md) | — |
+| clean up code without changing behavior | [workflows/refactor.md](workflows/refactor.md) | — |
+| review someone's work | [workflows/code-review.md](workflows/code-review.md) | — |
+| respond to something broken in production | [workflows/incident.md](workflows/incident.md) | — |
+| change Sara herself | [workflows/self-upgrade.md](workflows/self-upgrade.md) | — |
+| decide which agent to use | [roster/README.md](roster/README.md) | [workflows/delegation.md](workflows/delegation.md) |
+| measure whether Sara is getting better | [evaluation/GOLDEN-TASKS.md](evaluation/GOLDEN-TASKS.md) | [evaluation/results/](evaluation/results/) |
+| know what is still unknown | [backlog/open-questions.md](backlog/open-questions.md) | — |
 
-## Live — Current Architecture & Policy
+## Repository map
 
-- **SARA_ARCHITECTURE_CLEANUP_REPORT.md** — read-only architecture inventory and cleanup analysis (input to this cleanup).
-- **SARA_CLEANUP_BASELINE.md** — frozen starting state before the cleanup.
-- **SARA_TARGET_ARCHITECTURE.md** — intended policy/execution structure and source-of-truth owners.
-- **SARA_CLEANUP_CHANGE_MATRIX.md** — confirmed issues, owners, and actions.
-- **SARA_SYSTEM_MAP.md** — component inventory of Sara on this host.
+```
+sara-docs/
+├── AGENTS.md              operating contract: session protocol, knowledge
+│                          classification, evidence rules, doc rules
+├── memory/                durable state — current-state, decisions (ADR),
+│                          daily session records, lessons learned
+├── architecture/          SYSTEM-MAP (verified inventory) · OPERATING-MODEL
+│                          (classification → gating) · SELF-BOUNDARY (scope)
+├── workflows/             the SDLC playbooks — one per recurring job
+├── roster/                routing table + per-agent contracts
+├── evaluation/            golden tasks, dated results, telemetry contract
+├── backlog/               open questions with owners and blocking severity
+├── scripts/               validators: structure, host drift, links, secrets
+├── tests/                 tests for the validators
+└── archive/               frozen history — old reports, kept as evidence only
+```
 
-## Current Evaluation & Boundaries
+## How to keep this honest
 
-- **SARA_GOLDEN_TASKS.md** — golden probe set (frozen during cleanup).
-- **SARA-GOLDEN-RESULTS.md** — evidence records from golden-task runs.
-- **SARA_SELF_BOUNDARY.md** — rules for when Sara may modify herself.
-- **SARA_TELEMETRY_CONTRACT.md** — telemetry event interface (producer/consumer boundary).
+```powershell
+python scripts/validate_docs.py     # the gate: structure, drift, links, secrets
+python -m pytest tests -q           # proof that the gate itself works
+```
 
-## Exam series — examiner records
+`archive/` is exempt from freshness rules on purpose: it is history and must not
+be edited to look current. If an archived claim is wrong today, the fix belongs
+in a living doc, with the archive left as the record of what was believed then.
 
-- **SARA_EXAMS.md** — the `dotin-10day-challenges` exam series: exam map, the EXAM-01
-  grading record (25/100 technical, official 0 for an uncommitted submission), the
-  examiner probe method, the candidate development plan, and durable environment facts.
+## Status
 
-## Cleanup output (2026-08-30)
+Foundation (structure, validators, entry point, memory, backlog) is in place.
+Workflows, roster contracts, and the architecture docs are being written in this
+same build. Anything not yet migrated is tracked in
+[backlog/open-questions.md](backlog/open-questions.md).
 
-- `SARA_ARCHITECTURE_CLEANUP_FINAL_REPORT.md` — final report + regression matrix + duplication audit + truth table.
+## What this repo is not
 
-## Historical Reports (archive/)
-
-- **archive/SARA_SELF_UPGRADE_ROUND2_BASELINE.md** — pre-Round-2 baseline.
-- **archive/SARA_SELF_UPGRADE_ROUND2_FINAL_REPORT.md** — Round 2 final report.
-- **archive/SARA_UPGRADE_CANDIDATES.md** — Round 2 candidate items.
-- **archive/SARA_ROUND2_CONTROLLED_TEST_REPORT.md** — Round 2 controlled test.
-- **archive/PONYTAIL_SELF_UPGRADE_REPORT.md** — vendored ponytail audit.
-- **archive/SARA_ARCHITECTURE_AFTER_ROUND2.md** — Round 2 architecture (superseded).
-
-## External project docs
-
-- **PROGRESS-PHASE-2.md** — ai-swe-engine Phase 2 progress manifest (not Sara itself).
-
-## Not part of Sara
-
-- **ponytail/** — vendored `@dietrichgebert/ponytail` plugin project (3rd-party).
-- **java/** — temporary Java scaffold.
-- **.idea/** — JetBrains IDE state.
-
-These are intentionally left untracked/out of the versioned Sara layout.
+- Not Sara's runtime. The live runtime is the opencode config surface at
+  `C:\Users\m.barani\.config\opencode` — see
+  [architecture/SYSTEM-MAP.md](architecture/SYSTEM-MAP.md) for the verified
+  boundary between the two.
+- Not project source code. It never contains application code, only how Sara
+  approaches it.

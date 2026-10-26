@@ -1,7 +1,14 @@
-# JetBrains IDE state — intentionally untracked (see README "Not part of Sara")
+# JetBrains IDE state — intentionally untracked (see README "What this repo is not")
 .idea/
 *.iml
 
 # OS noise
 Thumbs.db
 .DS_Store
+
+# Python — validator and test caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
