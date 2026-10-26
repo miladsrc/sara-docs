@@ -100,6 +100,12 @@ FOREIGN_ALLOWLIST = (
 BACKTICK = re.compile(r"`([^`\n]+)`")
 ABS_PATH_RE = re.compile(r"^(?:[A-Za-z]:[\\/]|~[\\/])")
 
+# R3 is a host-drift check: an absolute path can only be verified on the machine
+# that owns it. On another platform (a CI runner) every such path is missing by
+# construction, so the rule reports itself as skipped instead of failing every
+# document. Local runs on the owner's platform keep enforcing it.
+HOST_PATH_CHECKS = os.name == "nt"
+
 TODO_RE = re.compile(r"\b(TODO|FIXME|XXX)\b")
 
 SKIP_DIRS = {".git", ".idea", ".venv", "__pycache__", "node_modules", ".pytest_cache"}
@@ -162,6 +168,8 @@ def check_host_refs(root: str) -> list[str]:
 
 def check_abs_paths(root: str) -> list[str]:
     problems = []
+    if not HOST_PATH_CHECKS:
+        return problems
     for doc in _living_docs(root):
         rel = os.path.relpath(doc, root).replace("\\", "/")
         text = _read(doc)
@@ -241,6 +249,10 @@ def main(argv: list[str] | None = None) -> int:
         failures.append(f"R5 {hit['rule']}: {hit['file']}:{hit['line']}")
 
     warnings = date_warnings + check_todos(root)
+    if not HOST_PATH_CHECKS:
+        warnings.append(
+            "R3 skipped: absolute host paths are not verifiable off the owner's platform"
+        )
 
     if not args.quiet:
         for w in warnings:

@@ -1,9 +1,12 @@
 # Documentation gate.
 #
 # Runs on push and pull requests against the GitHub remote
-# (github.com/miladsrc/sara-docs, added 2026-10-26). The workflow definition is
-# committed; whether a given run passed is only known from the Actions tab or the
-# API — see memory/current-state.md for verified state.
+# (github.com/miladsrc/sara-docs, added 2026-10-26). Whether a given run passed is
+# only known from the Actions tab or the API — see memory/current-state.md.
+#
+# Note: R3 (absolute host paths must exist) is a host-drift check that can only
+# run on the owner's Windows machine. On the Linux runner the validator reports
+# "R3 skipped" as a warning instead of failing; the other six rules run in full.
 name: docs-gate
 
 on:

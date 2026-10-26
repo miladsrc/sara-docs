@@ -164,11 +164,20 @@ def test_host_refs_allowlist_is_not_a_wildcard(tmp_path, monkeypatch):
     assert validate_docs.check_host_refs(root) != []
 
 
-def test_abs_paths_flag_nonexistent(tmp_path):
+def test_abs_paths_flag_nonexistent(tmp_path, monkeypatch):
     root = str(tmp_path)
+    monkeypatch.setattr(validate_docs, "HOST_PATH_CHECKS", True)
     write(root, "README.md", "config at `C:/definitely/not/here/x.md`\n")
     problems = validate_docs.check_abs_paths(root)
     assert any("does not exist" in p for p in problems)
+
+
+def test_abs_paths_skipped_off_host_platform(tmp_path, monkeypatch):
+    """R3 cannot verify another machine's paths: it must skip, not fail."""
+    root = str(tmp_path)
+    monkeypatch.setattr(validate_docs, "HOST_PATH_CHECKS", False)
+    write(root, "README.md", "config at `C:/definitely/not/here/x.md`\n")
+    assert validate_docs.check_abs_paths(root) == []
 
 
 def test_abs_paths_allow_existing(tmp_path):
@@ -177,6 +186,17 @@ def test_abs_paths_allow_existing(tmp_path):
     target = os.path.join(root, "real", "file.md").replace("\\", "/")
     write(root, "README.md", f"config at `{target}`\n")
     assert validate_docs.check_abs_paths(root) == []
+
+
+def test_main_reports_skipped_host_check_without_failing(tmp_path, monkeypatch, capsys):
+    """Off the owner's platform the gate must still pass, and must say why."""
+    root = str(tmp_path)
+    monkeypatch.setattr(validate_docs, "REQUIRED", ["README.md"])
+    monkeypatch.setattr(validate_docs, "VERIFIED_REQUIRED", [])
+    monkeypatch.setattr(validate_docs, "HOST_PATH_CHECKS", False)
+    write(root, "README.md", "# ok\nconfig at `C:/definitely/not/here/x.md`\n")
+    assert validate_docs.main(["--root", root]) == 0
+    assert "R3 skipped" in capsys.readouterr().out
 
 
 def test_abs_paths_skip_placeholders(tmp_path):
